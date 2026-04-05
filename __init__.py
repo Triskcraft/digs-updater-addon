@@ -57,7 +57,7 @@ class mdaddon:
             return
         self.dir_path = dir_path
 
-        create_task(self.chron_job())
+        self._chron_task = create_task(self.chron_job())
 
     async def digs_job(self):
         data: list[WebhookData] = []
@@ -93,3 +93,7 @@ class mdaddon:
         }
 
         return post(self.url, data=raw_body, headers=headers)
+
+    def unload(self):
+        if self._chron_task and not self._chron_task.done():
+            self._chron_task.cancel()
