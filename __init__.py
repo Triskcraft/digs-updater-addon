@@ -13,7 +13,7 @@ from requests import post
 MinecraftStats = TypedDict(
     "MinecraftStats",
     {
-        "minecraft:mined": dict[str, int],
+        "minecraft:mined": dict[str, int] | None,
     },
 )
 
@@ -67,7 +67,8 @@ class mdaddon:
                 file_path = path.join(self.dir_path, filename)
                 with open(file_path, encoding="utf-8") as f:
                     stats = cast(MinecraftDataStatsJson, load(f))
-                    digs = sum(stats["stats"]["minecraft:mined"].values())
+                    mined = stats["stats"]["minecraft:mined"] or {}
+                    digs = sum(mined.values())
                     data.append(WebhookData(uuid=filename[:-5], digs=digs))
 
         self.send_webhook(data)
