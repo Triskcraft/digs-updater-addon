@@ -67,7 +67,7 @@ class mdaddon:
                 file_path = path.join(self.dir_path, filename)
                 with open(file_path, encoding="utf-8") as f:
                     stats = cast(MinecraftDataStatsJson, load(f))
-                    mined = stats["stats"]["minecraft:mined"] or {}
+                    mined = stats.get("stats", {}).get("minecraft:mined", {}) or {}
                     digs = sum(mined.values())
                     data.append(WebhookData(uuid=filename[:-5], digs=digs))
 
