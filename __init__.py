@@ -1,4 +1,4 @@
-from asyncio import create_task, sleep
+from asyncio import Task, create_task, sleep
 from hashlib import sha256
 from hmac import new
 from json import dumps, load
@@ -31,6 +31,7 @@ class WebhookData(TypedDict):
 class mdaddon:
     def __init__(self, client: McDisClient) -> None:
         self.client = client
+        self._chron_task: Task[None] | None = None
         load_dotenv(".env")
 
         token = getenv("DIGS_UPDATER_TOKEN")
@@ -73,7 +74,7 @@ class mdaddon:
 
         self.send_webhook(data)
 
-    async def chron_job(self):
+    async def chron_job(self) -> None:
         while True:
             await self.digs_job()
             await sleep(6 * 60 * 60)
@@ -94,6 +95,6 @@ class mdaddon:
 
         return post(self.url, data=raw_body, headers=headers)
 
-    def unload(self):
+    def unload(self) -> None:
         if self._chron_task and not self._chron_task.done():
             self._chron_task.cancel()
